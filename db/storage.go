@@ -5,7 +5,6 @@ import (
 	"inventory/models"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -41,10 +40,13 @@ func GetParentStorages() (any, error) {
 		return nil, err
 	}
 
-	data := []primitive.M{}
+	// This is a mess...
+	data := []models.ParentStorage{}
 	for _, result := range results {
-		cursor.Decode(&result)
-		data = append(data, result)
+		var pStorage models.ParentStorage
+		resultBinary, _ := bson.Marshal(result)
+		bson.Unmarshal(resultBinary, &pStorage)
+		data = append(data, pStorage)
 	}
 
 	return data, nil
